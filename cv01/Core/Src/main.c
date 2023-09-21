@@ -89,7 +89,10 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  uint16_t i;
+  /*uint32_t sos;
+  sos=0b10101001110111011100101010000000;*/
+  uint8_t sos[] = {1,0,1,0,1,0,0,1,1,1,0,1,1,1,0,1,1,1,0,0,1,0,1,0,1,0,0,0,0,0,0,0};
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -97,10 +100,19 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	LL_GPIO_SetOutputPin(LD2_GPIO_Port, LD2_Pin);
-	LL_mDelay(500);
-	LL_GPIO_ResetOutputPin(LD2_GPIO_Port, LD2_Pin);
-	LL_mDelay(500);
+	for (i=0;i<32;i++)
+	{
+		if(sos[i] == 1) /*((sos>>i)&0b1)*/
+		{
+			LL_GPIO_SetOutputPin(LD2_GPIO_Port, LD2_Pin);
+			LL_mDelay(200);
+		}
+		else
+		{
+			LL_GPIO_ResetOutputPin(LD2_GPIO_Port, LD2_Pin);
+			LL_mDelay(200);
+		}
+	}
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
