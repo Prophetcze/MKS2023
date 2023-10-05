@@ -31,7 +31,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TLACITKO	   40
 #define LED_TIME_BLINK 300
 #define LED_TIME_SHORT 100
 #define LED_TIME_LONG  1000
@@ -308,12 +307,10 @@ void tlacitka(void)
 	static uint32_t delay2;
 
 	static uint32_t old_s2;
+	static uint32_t old_s1;
 	static uint32_t off_time;
 
-	static uint32_t old_s1;
-	static uint32_t off_time2;
-
-	if (Tick > delay2 + TLACITKO)
+	if (Tick > delay2 + 40)
 		{
 			uint32_t new_s2 = LL_GPIO_IsInputPinSet(S2_GPIO_Port, S2_Pin);
 			uint32_t new_s1 = LL_GPIO_IsInputPinSet(S1_GPIO_Port, S1_Pin);
@@ -327,7 +324,7 @@ void tlacitka(void)
 
 			if(old_s1 && !new_s1)
 			{
-				off_time2 = Tick + LED_TIME_LONG;
+				off_time = Tick + LED_TIME_LONG;
 				LL_GPIO_SetOutputPin(LED2_GPIO_Port, LED2_Pin);
 			}
 			old_s1 = new_s1;
@@ -335,12 +332,12 @@ void tlacitka(void)
 			delay2 = Tick;
 		}
 
-	if (Tick == off_time)
+	if (Tick > off_time)
 		{
 			LL_GPIO_ResetOutputPin(LED2_GPIO_Port, LED2_Pin);
 		}
 
-	if (Tick == off_time2)
+	if (Tick > off_time)
 		{
 			LL_GPIO_ResetOutputPin(LED2_GPIO_Port, LED2_Pin);
 		}
