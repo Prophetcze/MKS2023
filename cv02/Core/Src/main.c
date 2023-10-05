@@ -309,7 +309,7 @@ void tlacitka(void)
 	static uint16_t debounceS1 = 0xFFFF;
 	static uint16_t debounceS2 = 0xFFFF;
 
-	if (Tick > delay2 + 40)
+	if (Tick > delay2 + 5)
 		{
 			debounceS1 <<= 1;
 			debounceS2 <<= 1;
