@@ -305,36 +305,30 @@ void blikac(void)
 void tlacitka(void)
 {
 	static uint32_t delay2;
-
-	static uint32_t old_s2;
-	static uint32_t old_s1;
 	static uint32_t off_time;
+	static uint16_t debounceS1 = 0xFFFF;
+	static uint16_t debounceS2 = 0xFFFF;
 
 	if (Tick > delay2 + 40)
 		{
-			uint32_t new_s2 = LL_GPIO_IsInputPinSet(S2_GPIO_Port, S2_Pin);
-			uint32_t new_s1 = LL_GPIO_IsInputPinSet(S1_GPIO_Port, S1_Pin);
+			debounceS1 <<= 1;
+			debounceS2 <<= 1;
+			if(LL_GPIO_IsInputPinSet(S1_GPIO_Port, S1_Pin) == 0) debounceS1 |= 0x0001;
+			if(LL_GPIO_IsInputPinSet(S2_GPIO_Port, S2_Pin) == 0) debounceS2 |= 0x0001;
 
-			if(old_s2 && !new_s2)
-			{
-				off_time = Tick + LED_TIME_SHORT;
-				LL_GPIO_SetOutputPin(LED2_GPIO_Port, LED2_Pin);
-			}
-			old_s2 = new_s2;
-
-			if(old_s1 && !new_s1)
+			if(debounceS1 == 0x8000)
 			{
 				off_time = Tick + LED_TIME_LONG;
 				LL_GPIO_SetOutputPin(LED2_GPIO_Port, LED2_Pin);
 			}
-			old_s1 = new_s1;
+
+			if(debounceS2 == 0x7FFF)
+			{
+				off_time = Tick + LED_TIME_SHORT;
+				LL_GPIO_SetOutputPin(LED2_GPIO_Port, LED2_Pin);
+			}
 
 			delay2 = Tick;
-		}
-
-	if (Tick > off_time)
-		{
-			LL_GPIO_ResetOutputPin(LED2_GPIO_Port, LED2_Pin);
 		}
 
 	if (Tick > off_time)
