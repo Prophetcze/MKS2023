@@ -31,7 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define LED_TIME_BLINK 300
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -55,7 +55,7 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+volatile uint32_t Tick;
 /* USER CODE END 0 */
 
 /**
@@ -89,7 +89,7 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  LL_SYSTICK_EnableIT();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -97,7 +97,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  blikac();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -300,7 +300,16 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void blikac(void)
+{
+	static uint32_t delay;
 
+	if (Tick > delay + LED_TIME_BLINK)
+	{
+		LL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+		delay = Tick;
+	}
+}
 /* USER CODE END 4 */
 
 /**
