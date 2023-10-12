@@ -96,6 +96,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   sct_init();
+  HAL_TIM_Encoder_Start(&htim1, htim1.Channel);
   /*sct_led(0x7A5C36DE);
   HAL_Delay(1000); */
 
@@ -108,11 +109,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  for(uint32_t i = 0; i < 1000; i+=111)
+	  /*for(uint32_t i = 0; i < 1000; i+=111)
 	  {
 		  sct_value(i);
 		  HAL_Delay(500);
 	  }
+	  */
+	  sct_value(__HAL_TIM_GET_COUNTER(&htim1));
+	  HAL_Delay(50);
   }
   /* USER CODE END 3 */
 }
