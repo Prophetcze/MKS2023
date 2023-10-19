@@ -56,9 +56,6 @@ UART_HandleTypeDef huart2;
 static volatile uint32_t raw_pot;
 static volatile uint32_t raw_temp;
 static volatile uint32_t raw_volt;
-static uint32_t avg_pot;
-static uint8_t channel;
-static uint32_t button = 0;
 
 /* USER CODE END PV */
 
@@ -75,6 +72,9 @@ static void MX_ADC_Init(void);
 /* USER CODE BEGIN 0 */
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
+	static uint8_t channel;
+	static uint32_t avg_pot;
+
 	switch (channel)
 	{
 		case 0:
@@ -137,7 +137,9 @@ int main(void)
   sct_init();
   HAL_ADCEx_Calibration_Start(&hadc);
   HAL_ADC_Start_IT(&hadc);
+
   static enum { SHOW_POT, SHOW_VOLT, SHOW_TEMP } state = SHOW_POT;
+  static uint32_t button = 0;
 
   /* USER CODE END 2 */
 
