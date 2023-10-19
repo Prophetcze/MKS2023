@@ -31,7 +31,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define ADC_Q 12
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -60,11 +60,14 @@ static void MX_ADC_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 static volatile uint32_t raw_pot;
+static uint32_t avg_pot;
 
-  void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
-  {
-	  raw_pot = HAL_ADC_GetValue(hadc);
-  }
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+	raw_pot = avg_pot >> ADC_Q;
+	avg_pot -= raw_pot;
+	avg_pot += HAL_ADC_GetValue(hadc);
+}
 /* USER CODE END 0 */
 
 /**
@@ -110,7 +113,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	sct_value((raw_pot*501)/4096, (raw_pot/(4096/9)));
+	sct_value((raw_pot*(500+1))/4096, (raw_pot/(4096/9)));
 	HAL_Delay(50);
   }
   /* USER CODE END 3 */
