@@ -53,6 +53,11 @@ ADC_HandleTypeDef hadc;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+static volatile uint32_t raw_pot;
+static volatile uint32_t raw_temp;
+static volatile uint32_t raw_volt;
+static uint32_t avg_pot;
+static uint8_t channel;
 static uint32_t button = 0;
 
 /* USER CODE END PV */
@@ -68,12 +73,6 @@ static void MX_ADC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-static volatile uint32_t raw_pot;
-static volatile uint32_t raw_temp;
-static volatile uint32_t raw_volt;
-static uint32_t avg_pot;
-static uint8_t channel;
-
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 {
 	switch (channel)
