@@ -100,6 +100,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
 	else
 		channel++;
 }
+
 /* USER CODE END 0 */
 
 /**
@@ -137,6 +138,7 @@ int main(void)
   HAL_ADCEx_Calibration_Start(&hadc);
   HAL_ADC_Start_IT(&hadc);
   static enum { SHOW_POT, SHOW_VOLT, SHOW_TEMP } state = SHOW_POT;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -184,8 +186,10 @@ int main(void)
 	  	}
 	  	break;
 	}
+
 	HAL_Delay(50);
   }
+
   /* USER CODE END 3 */
 }
 
