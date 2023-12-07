@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "usbd_hid.h"
+#include <stdbool.h>
 #include <math.h>
 
 /* USER CODE END Includes */
@@ -61,79 +62,43 @@ static void MX_USART3_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-static uint8_t buff[4];
-
-void sendMouseCommand(int8_t deltaX, int8_t deltaY)
+void step(int8_t x, int8_t y, bool btn)
 {
-	buff[0] = 0x01; // stiskni leve tlacitko
-	buff[1] = deltaX; // posun o delta X
-	buff[2] = deltaY; // posun o delta Y
+	uint8_t buff[4];
+	buff[0] = btn; // stiskni leve tlacitko
+	buff[1] = x; // posun o delta X
+	buff[2] = y; // posun o delta Y
 	buff[3] = 0; // bez scrollu
 	USBD_HID_SendReport(&hUsbDeviceFS, buff, sizeof(buff));
 	HAL_Delay(USBD_HID_GetPollingInterval(&hUsbDeviceFS));
 }
 
-void circle(int step_circle)
+void circle(int rad, float start, float length)
 {
-	for (int i = 0; i <= step_circle; i++)
+	float x, y, fi;
+	int16_t sx = 0;
+	int16_t sy = 0;
+	uint8_t num_steps = 50;
+	for (uint8_t i = 0; i < num_steps*(length+start); i++)
 	{
-		float angle = 2*PI*i/step_circle;
+		fi = 2*PI*i/(num_steps-1);
 
-		int8_t deltaX = (int8_t)(20*cos(angle));
-		int8_t deltaY = (int8_t)(20*sin(angle));
+		x = rad*cosf(fi);
+		y = rad*sinf(fi);
 
-		sendMouseCommand(deltaX, deltaY);
+		if(fi>=(2*PI)*start)
+		{
+			step((int16_t)sx+x,(int16_t)sy+y,1);
+		}
+		else
+		{
+			step((int16_t)sx+x,(int16_t)sy+y,0);
+		}
+
+		sx = (int16_t)x;
+		sy = (int16_t)y;
 	}
-}
-
-void eye(int step_eye, int8_t X, int8_t Y)
-{
-	buff[0] = 0x00; // vypni leve tlacitko
-	buff[1] = X; // posun o X
-	buff[2] = Y; // posun o Y
-	buff[3] = 0; // bez scrollu
-	USBD_HID_SendReport(&hUsbDeviceFS, buff, sizeof(buff));
-	HAL_Delay(USBD_HID_GetPollingInterval(&hUsbDeviceFS));
-
-	for (int i = 0; i <= step_eye; i++)
-	{
-		float angle = 2*PI*i/step_eye;
-
-		int8_t deltaX = (int8_t)(20*cos(angle));
-		int8_t deltaY = (int8_t)(20*sin(angle));
-
-		sendMouseCommand(deltaX, deltaY);
-	}
-}
-
-void mouth(int step_mouth, int8_t X, int8_t Y)
-{
-	buff[0] = 0x00; // vypni leve tlacitko
-	buff[1] = X; // posun o X
-	buff[2] = Y; // posun o Y
-	buff[3] = 0; // bez scrollu
-	USBD_HID_SendReport(&hUsbDeviceFS, buff, sizeof(buff));
-	HAL_Delay(USBD_HID_GetPollingInterval(&hUsbDeviceFS));
-
-	for (int i = 0; i <= step_mouth/3; i++)
-	{
-		float angle = 2*(PI*i/step_mouth)-45;
-
-		int8_t deltaX = (int8_t)(20*cos(angle));
-		int8_t deltaY = (int8_t)(20*-sin(angle));
-
-		sendMouseCommand(deltaX, deltaY);
-	}
-}
-
-void clearMouseCommand(void)
-{
-	buff[0] = 0x00; // vypni leve tlacitko
-	buff[1] = (int8_t)(0); // posun o 0
-	buff[2] = (int8_t)(0); // posun o 0
-	buff[3] = 0; // bez scrollu
-	USBD_HID_SendReport(&hUsbDeviceFS, buff, sizeof(buff));
-	HAL_Delay(USBD_HID_GetPollingInterval(&hUsbDeviceFS));
+	step(0, 0, 0);
 }
 
 
@@ -182,17 +147,16 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  if(HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin))
 	  {
-		  circle(100);
-		  clearMouseCommand();
-		  eye(10,-80,100);
-		  clearMouseCommand();
-		  eye(10,120,0);
-		  clearMouseCommand();
-		  sendMouseCommand(-80,80);
-		  sendMouseCommand(0,80);
-		  clearMouseCommand();
-		  mouth(65,-110,30);
-		  clearMouseCommand();
+		  circle(10,0,1);
+		  step(-5,35,0);
+		  circle(8,3.0/8.0,2.0/8.0);
+		  step(10,-80,0);
+		  circle(2,0,1);
+		  step(90,0,0);
+		  circle(2,0,1);
+		  step(-45,10,0);
+		  step(0,25,1);
+		  step(0,30,0);
 	  }
   }
   /* USER CODE END 3 */
