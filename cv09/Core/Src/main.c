@@ -35,6 +35,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define PI 3.14159265359
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -72,6 +73,59 @@ void sendMouseCommand(int8_t deltaX, int8_t deltaY)
 	HAL_Delay(USBD_HID_GetPollingInterval(&hUsbDeviceFS));
 }
 
+void circle(int step_circle)
+{
+	for (int i = 0; i <= step_circle; i++)
+	{
+		float angle = 2*PI*i/step_circle;
+
+		int8_t deltaX = (int8_t)(20*cos(angle));
+		int8_t deltaY = (int8_t)(20*sin(angle));
+
+		sendMouseCommand(deltaX, deltaY);
+	}
+}
+
+void eye(int step_eye, int8_t X, int8_t Y)
+{
+	buff[0] = 0x00; // vypni leve tlacitko
+	buff[1] = X; // posun o X
+	buff[2] = Y; // posun o Y
+	buff[3] = 0; // bez scrollu
+	USBD_HID_SendReport(&hUsbDeviceFS, buff, sizeof(buff));
+	HAL_Delay(USBD_HID_GetPollingInterval(&hUsbDeviceFS));
+
+	for (int i = 0; i <= step_eye; i++)
+	{
+		float angle = 2*PI*i/step_eye;
+
+		int8_t deltaX = (int8_t)(20*cos(angle));
+		int8_t deltaY = (int8_t)(20*sin(angle));
+
+		sendMouseCommand(deltaX, deltaY);
+	}
+}
+
+void mouth(int step_mouth, int8_t X, int8_t Y)
+{
+	buff[0] = 0x00; // vypni leve tlacitko
+	buff[1] = X; // posun o X
+	buff[2] = Y; // posun o Y
+	buff[3] = 0; // bez scrollu
+	USBD_HID_SendReport(&hUsbDeviceFS, buff, sizeof(buff));
+	HAL_Delay(USBD_HID_GetPollingInterval(&hUsbDeviceFS));
+
+	for (int i = 0; i <= step_mouth/3; i++)
+	{
+		float angle = 2*(PI*i/step_mouth)-45;
+
+		int8_t deltaX = (int8_t)(20*cos(angle));
+		int8_t deltaY = (int8_t)(20*-sin(angle));
+
+		sendMouseCommand(deltaX, deltaY);
+	}
+}
+
 void clearMouseCommand(void)
 {
 	buff[0] = 0x00; // vypni leve tlacitko
@@ -81,6 +135,7 @@ void clearMouseCommand(void)
 	USBD_HID_SendReport(&hUsbDeviceFS, buff, sizeof(buff));
 	HAL_Delay(USBD_HID_GetPollingInterval(&hUsbDeviceFS));
 }
+
 
 /* USER CODE END 0 */
 
@@ -127,17 +182,16 @@ int main(void)
     /* USER CODE BEGIN 3 */
 	  if(HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin))
 	  {
-		  int steps = 50;
-
-		  for (int i = 0; i <= steps; i++)
-		  {
-			  float angle = 2*PI*i/steps;
-
-			  int8_t deltaX = (int8_t)(10*cos(angle));
-			  int8_t deltaY = (int8_t)(10*sin(angle));
-
-			  sendMouseCommand(deltaX, deltaY);
-		  }
+		  circle(100);
+		  clearMouseCommand();
+		  eye(10,-80,100);
+		  clearMouseCommand();
+		  eye(10,120,0);
+		  clearMouseCommand();
+		  sendMouseCommand(-80,80);
+		  sendMouseCommand(0,80);
+		  clearMouseCommand();
+		  mouth(65,-110,30);
 		  clearMouseCommand();
 	  }
   }
