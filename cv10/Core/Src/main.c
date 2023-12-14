@@ -63,6 +63,7 @@ void StartDefaultTask(void const * argument);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 extern void tcpecho_init(void);
+extern void telnet_init(void);
 
 /* USER CODE END 0 */
 
@@ -308,6 +309,9 @@ void StartDefaultTask(void const * argument)
 
   /* Inicializace http server */
   httpd_init();
+
+  /* Inicializace telnet server */
+  telnet_init();
 
   /* Infinite loop */
   for(;;)
